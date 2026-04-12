@@ -1,7 +1,7 @@
 # Canadian Job Market Intelligence
 ### Automated ETL pipeline and Power BI dashboard analyzing data analyst job postings across Canada
 
-[![Live Dashboard](https://img.shields.io/badge/Power%20BI-Live%20Dashboard-yellow?logo=powerbi)](YOUR_POWER_BI_LINK_HERE)
+[![Live Dashboard](https://img.shields.io/badge/Power%20BI-Live%20Dashboard-yellow?logo=powerbi)](https://app.powerbi.com/reportEmbed?reportId=cccd11b8-77dd-40c2-8854-ffbe08e7e851&autoAuth=true&ctid=76ae1115-1efc-4af2-a536-e2b2443af1a0)
 [![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python)](adzuna_test.py)
 [![Power BI](https://img.shields.io/badge/Power%20BI-PL--300-yellow?logo=powerbi)](https://learn.microsoft.com/en-us/certifications/power-bi-data-analyst-associate/)
 
