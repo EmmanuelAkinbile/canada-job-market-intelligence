@@ -22,7 +22,7 @@
 
 ![Canadian Job Market Intelligence Dashboard](YOUR_SCREENSHOT_LINK_HERE)
 
-🔗 **[View Live Report](YOUR_POWER_BI_LINK_HERE)**
+🔗 **[View Live Report](https://app.powerbi.com/reportEmbed?reportId=cccd11b8-77dd-40c2-8854-ffbe08e7e851&autoAuth=true&ctid=76ae1115-1efc-4af2-a536-e2b2443af1a0)**
 
 ---
 
