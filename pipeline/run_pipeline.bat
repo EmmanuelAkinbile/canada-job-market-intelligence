@@ -21,5 +21,12 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
+echo Running update_latest.py...
+"%PYTHON%" "%PROJECT%\update_latest.py"
+if %errorlevel% neq 0 (
+    echo [%date% %time%] ERROR: update_latest.py failed >> "%LOG%"
+    exit /b 1
+)
+
 echo [%date% %time%] Pipeline completed successfully >> "%LOG%"
 echo Done.
