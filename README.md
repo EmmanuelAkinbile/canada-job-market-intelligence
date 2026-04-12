@@ -2,7 +2,7 @@
 ### Automated ETL pipeline and Power BI dashboard analyzing data analyst job postings across Canada
 
 [![Live Dashboard](https://img.shields.io/badge/Power%20BI-Live%20Dashboard-yellow?logo=powerbi)](https://app.powerbi.com/reportEmbed?reportId=cccd11b8-77dd-40c2-8854-ffbe08e7e851&autoAuth=true&ctid=76ae1115-1efc-4af2-a536-e2b2443af1a0)
-[![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python)](adzuna_test.py)
+[![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python)](pipeline/adzuna_test.py)
 
 ---
 
@@ -20,7 +20,7 @@
 
 ## Dashboard Preview
 
-![Canadian Job Market Intelligence Dashboard](YOUR_SCREENSHOT_LINK_HERE)
+![Canadian Job Market Intelligence Dashboard](dashboard/dashboard_preview.png)
 
 🔗 **[View Live Report](https://app.powerbi.com/reportEmbed?reportId=cccd11b8-77dd-40c2-8854-ffbe08e7e851&autoAuth=true&ctid=76ae1115-1efc-4af2-a536-e2b2443af1a0)**
 
@@ -58,8 +58,8 @@ This architecture mirrors the [Ontario Rental Intelligence](https://github.com/E
 
 | File | Description |
 |---|---|
-| [`adzuna_test.py`](adzuna_test.py) | Main fetch script — calls Adzuna API, loops across job titles and cities, writes raw CSV |
-| [`clean_jobs.py`](clean_jobs.py) | Cleaning and enrichment script — deduplicates, runs skill keyword matching, outputs enriched CSV |
+| [`adzuna_test.py`](pipeline/adzuna_test.py) | Main fetch script — calls Adzuna API, loops across job titles and cities, writes raw CSV |
+| [`clean_jobs.py`](pipeline/clean_jobs.py) | Cleaning and enrichment script — deduplicates, runs skill keyword matching, outputs enriched CSV |
 
 ---
 
