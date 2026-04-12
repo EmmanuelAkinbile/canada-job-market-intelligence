@@ -60,6 +60,7 @@ This architecture mirrors the [Ontario Rental Intelligence](https://github.com/E
 |---|---|
 | [`adzuna_test.py`](pipeline/adzuna_test.py) | Main fetch script — calls Adzuna API, loops across job titles and cities, writes raw CSV |
 | [`clean_jobs.py`](pipeline/clean_jobs.py) | Cleaning and enrichment script — deduplicates, runs skill keyword matching, outputs enriched CSV |
+| [`run_pipeline.bat`](pipeline/run_pipeline.bat) | Runner script — chains both Python scripts in sequence, logs each run with timestamps to run_log.txt |
 
 ---
 
@@ -107,6 +108,8 @@ Built in Power BI Desktop and published to Power BI Service.
 | Power BI Desktop | Dashboard development |
 | Power BI Service | Report publishing and sharing |
 | DAX | Calculated measures and dynamic report elements |
+| Power Automate Desktop | Automation layer — orchestrates daily pipeline execution |
+| Windows Task Scheduler | Triggers Power Automate Desktop flow on a daily schedule |
 
 ---
 
@@ -119,7 +122,7 @@ Built in Power BI Desktop and published to Power BI Service.
 
 ### Phase 2 (Planned)
 - **AI enrichment layer** — Python script using an LLM to extract structured skills and salary data from description text, outputting an enriched CSV that feeds back into the existing Power BI report without rebuilding visuals
-- **Automated scheduling** — Power Automate Desktop triggering daily pipeline runs, keeping the dashboard current without manual execution
+- **Automated scheduling ✅** — Power Automate Desktop flow built and tested; daily schedule configured via Windows Task Scheduler. Pipeline runs automatically each day and logs results to run_log.txt
 - **City expansion** — Adding Montreal, Edmonton, and Winnipeg to broaden geographic coverage
 - **Historical tracking** — Accumulating daily snapshots to enable genuine posting trend analysis over time
 
