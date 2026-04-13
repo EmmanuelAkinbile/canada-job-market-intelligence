@@ -44,6 +44,12 @@ clean_jobs.py         ← Deduplicates on URL, runs keyword enrichment
 jobs_YYYY-MM-DD_clean.csv  ← Enriched dataset (386 clean rows)
       │
       ▼
+update_latest.py   ← Copies to jobs_latest_clean.csv
+      │
+      ▼
+OneDrive Sync      ← Automatic cloud sync
+      │
+      ▼
 Power BI Desktop      ← Connects to clean CSV, builds dashboard
       │
       ▼
@@ -60,6 +66,7 @@ This architecture mirrors the [Ontario Rental Intelligence](https://github.com/E
 |---|---|
 | [`adzuna_test.py`](pipeline/adzuna_test.py) | Main fetch script — calls Adzuna API, loops across job titles and cities, writes raw CSV |
 | [`clean_jobs.py`](pipeline/clean_jobs.py) | Cleaning and enrichment script — deduplicates, runs skill keyword matching, outputs enriched CSV |
+| [`update_latest.py`](pipeline/update_latest.py) | Copies today's clean CSV to jobs_latest_clean.csv for Power BI to always load the current snapshot |
 | [`run_pipeline.bat`](pipeline/run_pipeline.bat) | Runner script — chains both Python scripts in sequence, logs each run with timestamps to run_log.txt |
 
 ---
@@ -118,7 +125,6 @@ Built in Power BI Desktop and published to Power BI Service.
 ### Current Limitations
 - **Description snippets** — The Adzuna free tier returns short description previews rather than full job posting text. Skill mention frequencies reflect snippet content only and likely underrepresent actual demand for core tools like SQL and Python which appear deeper in job requirements sections.
 - **Salary data** — 73% of postings do not include structured salary fields. Some salary ranges appear within description text and are not yet extracted.
-- **Single snapshot** — Data is captured at a point in time. Postings older than a few weeks may have already expired, creating recency bias.
 
 ### Phase 2 (Planned)
 - **AI enrichment layer** — Python script using an LLM to extract structured skills and salary data from description text, outputting an enriched CSV that feeds back into the existing Power BI report without rebuilding visuals
