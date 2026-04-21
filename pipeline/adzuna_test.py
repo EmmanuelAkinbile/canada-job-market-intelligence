@@ -3,8 +3,8 @@ import csv
 from datetime import datetime
 import time
 
-APP_ID = "90e3d02d"
-API_KEY = "7ef7da94fc62c2fd1393d5c029cac106"
+APP_ID = "APP ID HERE"
+API_KEY = "API KEY HERE"
 
 url = "https://api.adzuna.com/v1/api/jobs/ca/search/1"
 
