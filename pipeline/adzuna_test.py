@@ -3,15 +3,15 @@ import csv
 from datetime import datetime
 import time
 
-APP_ID = "APP ID HERE"
-API_KEY = "API KEY HERE"
+APP_ID = "_____"
+API_KEY = "_____"
 
 url = "https://api.adzuna.com/v1/api/jobs/ca/search/1"
 
 job_titles = [
     "data analyst",
     "business analyst",
-    "BI analyst",
+    "business intelligence analyst",
     "reporting analyst"
 ]
 
@@ -19,7 +19,14 @@ cities = [
     "toronto",
     "vancouver",
     "ottawa",
-    "calgary"
+    "calgary",
+    "edmonton",
+    "hamilton",
+    "mississauga",
+    "niagara falls",
+    "st. catherines",
+    "winnipeg",
+    "montreal"
 ]
 
 filename = f"jobs_{datetime.today().strftime('%Y-%m-%d')}.csv"
