@@ -21,6 +21,8 @@
 ## Dashboard Preview
 
 ![Canadian Job Market Intelligence Dashboard](dashboard/dashboard_preview.png)
+![Canadian Job Market Intelligence Dashboard](dashboard/dashboard_preview1.png)
+![Canadian Job Market Intelligence Dashboard](dashboard/dashboard_preview2.png)
 
 🔗 **[View Live Report](https://app.powerbi.com/reportEmbed?reportId=cccd11b8-77dd-40c2-8854-ffbe08e7e851&autoAuth=true&ctid=76ae1115-1efc-4af2-a536-e2b2443af1a0)**
 
