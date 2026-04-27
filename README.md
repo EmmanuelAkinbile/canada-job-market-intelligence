@@ -10,11 +10,11 @@
 
 > Data collected April 2026 · 386 active postings · 4 Canadian cities
 
-- **Toronto dominates** the Canadian market with 167 postings — nearly double Calgary (84) and Vancouver (79)
-- **226 unique companies** are actively hiring across data analyst roles, indicating a broad and distributed market
-- **Business Analyst** is the most posted title (40.16%), followed by Data Analyst (32.9%), Reporting Analyst (21.24%), and BI Analyst (5.7%)
-- **Staffing agencies** (Aviso Wealth, Insight Global, Targeted Talent) drive significant posting volume, suggesting strong contract and placement activity in the market
-- **Ottawa** trails other cities with 56 postings, reflecting its public sector hiring pace vs. private sector markets
+- **Toronto dominates** the Canadian market with 235 postings, ahead of Montreal (201) and Calgary (175)
+- **513 unique companies** are actively hiring across data analyst roles, indicating a broad and distributed market
+- **Business Analyst** is the most posted title (35.9%), followed by Data Analyst (30.8%), Reporting Analyst (21.5%), and BI Analyst (11.8%)
+- **Staffing agencies** (Insight Global, Targeted Talent, P@thlion) drive significant posting volume, suggesting strong contract and placement activity
+- **Excel and AI** are the most frequently mentioned skills, appearing in 30.9% and 26.3% of analyzed postings respectively
 
 ---
 
@@ -31,31 +31,34 @@
 ## Project Architecture
 
 ```
-Adzuna Jobs API
-      │
-      ▼
-adzuna_test.py        ← Fetches postings across 4 job titles × 4 cities
-      │                  Loops, deduplicates, writes raw CSV
-      ▼
-jobs_YYYY-MM-DD.csv   ← Raw data (417 rows before dedup)
-      │
-      ▼
-clean_jobs.py         ← Deduplicates on URL, runs keyword enrichment
-      │                  Adds binary skill columns + skills_found summary
-      ▼
-jobs_YYYY-MM-DD_clean.csv  ← Enriched dataset (386 clean rows)
-      │
-      ▼
-update_latest.py   ← Copies to jobs_latest_clean.csv
-      │
-      ▼
-OneDrive Sync      ← Automatic cloud sync
-      │
-      ▼
-Power BI Desktop      ← Connects to clean CSV, builds dashboard
-      │
-      ▼
-Power BI Service      ← Published, publicly accessible report
+Adzuna Jobs API          CareerJet API
+     │                        │
+     ▼                        ▼
+adzuna_test.py         careerjet_fetch.py   ← Fetch scripts run Mon/Thu via Task Scheduler
+     │                        │
+     ▼                        ▼
+jobs_YYYY-MM-DD.csv    jobs_careerjet_YYYY-MM-DD.csv
+     │                        │
+     ▼                        ▼
+clean_jobs.py          clean_careerjet.py   ← Clean, enrich, add skill/seniority/contract columns
+     │                        │
+     ▼                        ▼
+jobs_YYYY-MM-DD_clean.csv     jobs_careerjet_YYYY-MM-DD_clean.csv
+     │                        │
+     ▼                        ▼
+update_latest.py       update_careerjet_latest.py  ← Copy to latest CSV for Power BI
+     │                        │
+     ▼                        ▼
+jobs_latest_clean.csv  careerjet_latest_clean.csv
+     │                        │
+     ▼                        ▼
+             OneDrive Sync  ← Automatic cloud sync
+                 │
+                 ▼
+          Power BI Desktop  ← Appends both sources into combined_postings table
+                 │
+                 ▼
+          Power BI Service  ← Published, publicly accessible report
 ```
 
 This architecture mirrors the [Ontario Rental Intelligence](https://github.com/EmmanuelAkinbile/ontario-rental-intelligence) project — ETL handled entirely in Python, all analysis and visualization in Power BI.
@@ -66,28 +69,31 @@ This architecture mirrors the [Ontario Rental Intelligence](https://github.com/E
 
 | File | Description |
 |---|---|
-| [`adzuna_test.py`](pipeline/adzuna_test.py) | Main fetch script — calls Adzuna API, loops across job titles and cities, writes raw CSV |
-| [`clean_jobs.py`](pipeline/clean_jobs.py) | Cleaning and enrichment script — deduplicates, runs skill keyword matching, outputs enriched CSV |
-| [`update_latest.py`](pipeline/update_latest.py) | Copies today's clean CSV to jobs_latest_clean.csv for Power BI to always load the current snapshot |
-| [`run_pipeline.bat`](pipeline/run_pipeline.bat) | Runner script — chains both Python scripts in sequence, logs each run with timestamps to run_log.txt |
+| [`adzuna_test.py`](pipeline/adzuna_test.py) | Fetches postings from Adzuna API across job titles and cities, writes raw CSV |
+| [`clean_jobs.py`](pipeline/clean_jobs.py) | Cleans and enriches Adzuna data — deduplicates, runs skill keyword matching, adds seniority and contract type columns |
+| [`update_latest.py`](pipeline/update_latest.py) | Copies today's clean Adzuna CSV to jobs_latest_clean.csv |
+| [`careerjet_fetch.py`](pipeline/careerjet_fetch.py) | Fetches postings from CareerJet API across job titles and cities, writes raw CSV |
+| [`clean_careerjet.py`](pipeline/clean_careerjet.py) | Cleans and enriches CareerJet data — deduplicates, runs skill keyword matching, adds seniority and contract type columns |
+| [`update_careerjet_latest.py`](pipeline/update_careerjet_latest.py) | Copies today's clean CareerJet CSV to careerjet_latest_clean.csv |
+| [`run_pipeline.bat`](pipeline/run_pipeline.bat) | Runner script — chains all 6 scripts in sequence, logs each run with timestamps to run_log.txt |
 
 ---
 
 ## Data Pipeline
 
-### Fetch (`adzuna_test.py`)
-- Calls the [Adzuna Jobs API](https://developer.adzuna.com/) for Canadian postings
-- Loops across **4 job titles**: Data Analyst, Business Analyst, BI Analyst, Reporting Analyst
-- Loops across **4 cities**: Toronto, Vancouver, Ottawa, Calgary
-- Pulls 50 results per search combination (16 total API calls)
-- Writes timestamped raw CSV with fields: Title, Company, Location, Salary Min, Salary Max, Date Posted, Search Title, Search City, Description, URL
+### Fetch
+- **Adzuna** (`adzuna_test.py`) — Calls the [Adzuna Jobs API](https://developer.adzuna.com/) for Canadian postings across 4 job titles and 11 cities
+- **CareerJet** (`careerjet_fetch.py`) — Calls the CareerJet API for Canadian postings across the same job titles and cities
+- Both scripts write timestamped raw CSVs with fields: Title, Company, Location, Salary Min, Salary Max, Date Posted, Description, URL
+- Pipeline runs Monday and Thursday via Windows Task Scheduler
 
-### Clean & Enrich (`clean_jobs.py`)
-- Deduplicates on URL to remove postings that appear across multiple search queries
+### Clean & Enrich
+- Deduplicates on URL to remove postings appearing across multiple search queries
 - Runs keyword matching across 20 skills against the Description field
 - Outputs binary skill columns (1 = mentioned, 0 = not) for use in Power BI
 - Adds `skills_found` summary column listing all matched skills per posting
-- Writes timestamped enriched CSV
+- Adds `seniority_level` column — parsed from Title and Description: Junior, Senior, Leadership, Not Specified
+- Adds `contract_type` column — parsed from Title and Description: Full-Time, Contract, Internship, Part-Time
 
 **Skills tracked:**
 `SQL · Python · Excel · Power BI · Tableau · R · Azure · AWS · Snowflake · Databricks · ETL · DAX · Statistics · AI · Machine Learning · LLM · Generative AI · Copilot · NLP · Automation`
@@ -96,14 +102,26 @@ This architecture mirrors the [Ontario Rental Intelligence](https://github.com/E
 
 ## Dashboard
 
-Built in Power BI Desktop and published to Power BI Service.
+Built in Power BI Desktop and published to Power BI Service. Both sources are appended into a single `combined_postings` fact table in Power Query, with a `source` column preserving origin for filtering.
+
+All three pages support filtering by **Seniority Level** and **Contract Type**.
 
 **Page 1 — Market Overview**
 - KPI cards: Total Postings, Cities Covered, Top Hiring City, Total Companies Hiring
 - Job Postings by City (bar chart)
 - Job Postings by Title (donut chart)
 - Top Hiring Companies (treemap)
-- Dynamic subtitle updates automatically on data refresh
+
+**Page 2 — Skills Analysis**
+- Top Skills in Job Postings (horizontal bar chart, % of postings)
+- KPI cards: Total Postings, Postings With Skills, Top Skill
+- Filter by Seniority Level and Job Title
+
+**Page 3 — Salary Analysis**
+- KPI cards: Average Salary Min, Average Salary Max, Postings With Salary
+- Salary Range by Job Title (clustered bar chart)
+- Salary Range by Province (map)
+- Salary Range by City (clustered bar chart)
 
 ---
 
@@ -113,7 +131,8 @@ Built in Power BI Desktop and published to Power BI Service.
 |---|---|
 | Python | ETL pipeline — data extraction, cleaning, enrichment |
 | pandas | Deduplication and keyword matching |
-| Adzuna API | Source of Canadian job posting data |
+| Adzuna API | Primary source of Canadian job posting data |
+| CareerJet API | Secondary source of Canadian job posting data |
 | Power BI Desktop | Dashboard development |
 | Power BI Service | Report publishing and sharing |
 | DAX | Calculated measures and dynamic report elements |
@@ -124,15 +143,16 @@ Built in Power BI Desktop and published to Power BI Service.
 
 ## Limitations & Phase 2 Roadmap
 
-### Current Limitations
-- **Description snippets** — The Adzuna free tier returns short description previews rather than full job posting text. Skill mention frequencies reflect snippet content only and likely underrepresent actual demand for core tools like SQL and Python which appear deeper in job requirements sections.
-- **Salary data** — 73% of postings do not include structured salary fields. Some salary ranges appear within description text and are not yet extracted.
+- **Description snippets** — Both APIs return short description previews rather than full posting text. Skill mention frequencies reflect snippet content only and likely underrepresent actual demand for tools like SQL and Python which appear deeper in job requirements.
+- **Salary data** — The majority of postings do not include structured salary fields. Salary analysis is based on the subset of postings where salary data is available.
 
-### Phase 2 (Planned)
-- **AI enrichment layer** — Python script using an LLM to extract structured skills and salary data from description text, outputting an enriched CSV that feeds back into the existing Power BI report without rebuilding visuals
-- **Automated scheduling ✅** — Power Automate Desktop flow built and tested; daily schedule configured via Windows Task Scheduler. Pipeline runs automatically each day and logs results to run_log.txt
-- **City expansion** — Adding Montreal, Edmonton, and Winnipeg to broaden geographic coverage
-- **Historical tracking** — Accumulating daily snapshots to enable genuine posting trend analysis over time
+## Phase 3 Roadmap
+
+- **Time Intelligence** — As daily CSV snapshots accumulate, the pipeline will support genuine longitudinal analysis: tracking which skills are rising or declining in demand week-over-week, identifying seasonal hiring patterns, and measuring how posting volume shifts across cities over time. The infrastructure is already in place — this becomes available naturally as the dataset grows.
+
+- **Cloud Storage Migration** — Migrating raw and enriched CSVs from local OneDrive sync to Azure Blob Storage, enabling a fully cloud-native pipeline that runs independently of a local machine. This would replace the current Task Scheduler setup with Azure-native scheduling and eliminate the dependency on an always-on local environment.
+
+- **Video Walkthrough** — A short recorded walkthrough of the pipeline architecture and dashboard, demonstrating the end-to-end flow from API fetch to published report.
 
 ---
 
