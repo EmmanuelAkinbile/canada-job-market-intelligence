@@ -28,5 +28,26 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
+echo Running careerjet_fetch.py...
+"%PYTHON%" "%PROJECT%\careerjet_fetch.py"
+if %errorlevel% neq 0 (
+    echo [%date% %time%] ERROR: careerjet_fetch.py failed >> "%LOG%"
+    exit /b 1
+)
+
+echo Running clean_careerjet.py...
+"%PYTHON%" "%PROJECT%\clean_careerjet.py"
+if %errorlevel% neq 0 (
+    echo [%date% %time%] ERROR: clean_careerjet.py failed >> "%LOG%"
+    exit /b 1
+)
+
+echo Running update_careerjet_latest.py...
+"%PYTHON%" "%PROJECT%\update_careerjet_latest.py"
+if %errorlevel% neq 0 (
+    echo [%date% %time%] ERROR: update_careerjet_latest.py failed >> "%LOG%"
+    exit /b 1
+)
+
 echo [%date% %time%] Pipeline completed successfully >> "%LOG%"
 echo Done.
