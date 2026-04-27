@@ -13,6 +13,10 @@ print(f"Before dedup: {len(df)} rows")
 df = df.drop_duplicates(subset=["URL"])
 print(f"After dedup: {len(df)} rows")
 
+# --- Add source and date parsed ---
+df["source"] = "adzuna"
+df["date_parsed"] = datetime.today().strftime('%Y-%m-%d')
+
 # --- Prep description for matching ---
 df["Description_lower"] = df["Description"].fillna("").str.lower()
 
@@ -61,6 +65,32 @@ df["skills_found"] = df[skill_cols].apply(
 
 # --- Drop helper column ---
 df = df.drop(columns=["Description_lower"])
+
+# --- Seniority Level (Title first, then Description) ---
+def get_seniority(title, desc):
+    for text in [str(title).lower(), str(desc).lower()]:
+        if any(k in text for k in ["senior", "sr.", " sr "]):
+            return "Senior"
+        elif any(k in text for k in ["junior", "jr.", " jr ", "entry"]):
+            return "Junior"
+        elif any(k in text for k in ["lead", "manager", "director", "head of"]):
+            return "Leadership"
+    return "Not Specified"
+
+df["seniority_level"] = df.apply(lambda row: get_seniority(row["Title"], row["Description"]), axis=1)
+
+# --- Contract Type (Title first, then Description) ---
+def get_contract_type(title, desc):
+    for text in [str(title).lower(), str(desc).lower()]:
+        if any(k in text for k in ["intern", "internship", "co-op", "coop"]):
+            return "Internship"
+        elif any(k in text for k in ["contract", "temporary", "temp", "fixed-term", "fixed term"]):
+            return "Contract"
+        elif "part-time" in text or "part time" in text:
+            return "Part-Time"
+    return "Full-Time"
+
+df["contract_type"] = df.apply(lambda row: get_contract_type(row["Title"], row["Description"]), axis=1)
 
 # --- Save ---
 df.to_csv(output_filename, index=False)
