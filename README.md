@@ -146,7 +146,7 @@ All three pages support filtering by **Seniority Level** and **Contract Type**.
 - **Description snippets** — Both APIs return short description previews rather than full posting text. Skill mention frequencies reflect snippet content only and likely underrepresent actual demand for tools like SQL and Python which appear deeper in job requirements.
 - **Salary data** — The majority of postings do not include structured salary fields. Salary analysis is based on the subset of postings where salary data is available.
 
-## Phase 3 Roadmap
+### Phase 3 Roadmap
 
 - **Time Intelligence** — As daily CSV snapshots accumulate, the pipeline will support genuine longitudinal analysis: tracking which skills are rising or declining in demand week-over-week, identifying seasonal hiring patterns, and measuring how posting volume shifts across cities over time. The infrastructure is already in place — this becomes available naturally as the dataset grows.
 
